@@ -1,0 +1,61 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    text-align: center;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+}
+
+h1 {
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+p {
+    font-size: 1.1rem;
+}
+
+.main-content {
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+    background-color: #f0f0f0;  /* Add background color for refinement */
+}
+
+.visualization-card {
+    display: flex;
+    width: 80%; /* Decrease width for more padding */
+    justify-content: space-between;
+    background-color: #fff;
+    padding: 40px;  /* Increase padding for more spacing */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px; /* Slightly more rounding */
+}
+
+.visual-container {
+    width: 48%; /* Equal size for both visualizations */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center align the chart */
+}
+
+h2 {
+    font-size: 1.5rem;
+    color: black;
+    padding-bottom: 40px;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+    margin-top: 20px;
+}

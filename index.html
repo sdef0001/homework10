@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employment in Australia Dashboard</title>
+    <link rel="stylesheet" href="files/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vega@5.30.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.20.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.26.0"></script>
+    <style>
+        /* Basic styling for the page */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: #fff;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        p {
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+            background-color: #f0f0f0;  /* Add background color for refinement */
+            position: relative;  /* Important for positioning the annotation */
+        }
+
+        .visualization-card {
+            display: flex;
+            width: 80%;
+            justify-content: space-between;
+            background-color: #fff;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            position: relative;  /* Important for the positioning of the annotation */
+        }
+
+        .visual-container {
+            width: 48%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: black;
+            padding-bottom: 40px;
+        }
+
+        /* Annotation box styling */
+        .annotation-box {
+            position: absolute;
+            top: 390px; /* Adjust this to position the annotation */
+            left: 75%;  /* Adjust this to position the annotation */
+            background-color: white;
+            border: 2px solid #333;
+            padding: 10px;
+            border-radius: 6px;
+            width: 150px;
+            text-align: center;
+            font-size: 0.7rem;
+            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Arrow styling */
+        .arrow {
+            position: absolute;
+            top: 320px; /* Adjust this */
+            left: 55%;  /* Adjust this */
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid #333; /* Arrow color */
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header style="padding-left: 100px; padding-right: 100px">
+        <div>
+            <h1>Unemployment Rates </h1>
+            <h2 style="color: white; margin-bottom: -40px;">Global Overview & JobSeeker Age Distribution in Australia</h2>
+            <p>This dashboard provides a global perspective on unemployment rates in 2023, alongside the age distribution of JobSeeker payments in Australia from 2020 to 2024.</p>
+        </div>
+    </header>
+
+    <!-- Main Content Section -->
+    <section class="main-content">
+        <!-- Visualization Card with Two Sections -->
+        <div class="visualization-card">
+            <div class="visual-container" style="margin-left: 40px;" id="global-unemployment">
+                <h2 style="text-align: center;">Global Unemployment Rates in 2023</h2>
+                <div id="vis1" style="margin-left: 90px"></div> <!-- Placeholder for the global unemployment map -->
+            </div>
+
+            <div class="visual-container" id="age-group-unemployment">
+                <h2 style="text-align: center;">Age Distribution of JobSeeker Payments (2020-2024)</h2>
+                <div id="vis2" style="margin-left: 140px;"></div> <!-- Placeholder for the donut chart -->
+            </div>
+        </div>
+
+        <!-- Annotation (Text Box and Arrow) -->
+        <div class="annotation-box">
+            35-44 age group saw <strong>high demand</strong> for jobseaker during COVID-19 in 2020. This <strong>slowly decreased</strong> in later years.
+        </div>
+        <!-- <div class="arrow"></div> -->
+
+    </section>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>Created by: Shean De Fonseka</p>
+        <p>Data Source: Australian Bureau of Statistics & Global Labor Market Data</p>
+    </footer>
+
+    <!-- Vega Embed Scripts for the Visualizations -->
+    <script>
+        // Global Unemployment Visualization (Equalized size)
+        const spec1 = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "width": 450,
+            "height": 250,
+            "title": "Global Unemployment Rates in 2023",
+            "projection": {"type": "equalEarth"},
+            "layer": [
+                {"data": {"sphere": true}, "mark": {"type": "geoshape", "fill": "#97CCE8"}},
+                {"data": {"graticule": {"step": [30, 30]}}, "mark": {"type": "geoshape", "stroke": "#FFFFFF", "strokeWidth": 0.5}},
+                {
+                    "data": {
+                        "url": "https://raw.githubusercontent.com/sdef0001/homework9/refs/heads/main/files/js/countries-110m.json",
+                        "format": {"type": "topojson", "feature": "countries"}
+                    },
+                    "transform": [
+                        {
+                            "lookup": "id",
+                            "from": {
+                                "data": {
+                                    "url": "https://raw.githubusercontent.com/sdef0001/homework9/refs/heads/main/files/data/unemployment_data_with_iso.csv",
+                                    "format": {"type": "csv"}
+                                },
+                                "key": "ISO_Code",
+                                "fields": ["Unemployment_Rate", "Country_Name"]
+                            }
+                        }
+                    ],
+                    "mark": {"type": "geoshape", "stroke": "#d3d3d3"},
+                    "encoding": {
+                        "color": {
+                            "field": "Unemployment_Rate",
+                            "type": "quantitative",
+                            "title": "Unemployment Rate (%)",
+                            "scale": {"scheme": "magma"}
+                        },
+                        "tooltip": [
+                            {"field": "Country_Name", "title": "Country Name", "type": "nominal"},
+                            {"field": "Unemployment_Rate", "title": "Unemployment Rate (%)", "type": "quantitative"}
+                        ]
+                    }
+                }
+            ],
+            "config": {}
+        };
+        vegaEmbed("#vis1", spec1, {mode: "vega-lite"}).then(console.log).catch(console.warn);
+
+        // Age Group Donut Chart Visualization with annotation
+        const spec2 = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "description": "A donut chart showing the distribution of JobSeeker Payment and Youth Allowance recipients by age group for different years.",
+            "width": 200,
+            "height": 200,
+            "params": [
+                {
+                    "name": "selected_year",
+                    "value": "2020",
+                    "bind": {
+                        "input": "select",
+                        "options": ["2020", "2021", "2022", "2023", "2024"],
+                        "labels": ["2020", "2021", "2022", "2023", "2024"],
+                        "name": "Select Year: "
+                    }
+                }
+            ],
+            "data": {
+                "values": [
+                    {"age_group": "Under 25 years", "year": "2020", "percentage": 18.28},
+                    {"age_group": "25-34 years", "year": "2020", "percentage": 22.93},
+                    {"age_group": "35-44 years", "year": "2020", "percentage": 30.01},
+                    {"age_group": "45-54 years", "year": "2020", "percentage": 10.32},
+                    {"age_group": "55-64 years", "year": "2020", "percentage": 10.24},
+                    {"age_group": "65 and over", "year": "2020", "percentage": 1.2},
+                    {"age_group": "Under 25 years", "year": "2021", "percentage": 19.07},
+                    {"age_group": "25-34 years", "year": "2021", "percentage": 21.42},
+                    {"age_group": "35-44 years", "year": "2021", "percentage": 18.71},
+                    {"age_group": "45-54 years", "year": "2021", "percentage": 19.16},
+                    {"age_group": "55-64 years", "year": "2021", "percentage": 19.28},
+                    {"age_group": "65 and over", "year": "2021", "percentage": 2.36},
+                    {"age_group": "Under 25 years", "year": "2022", "percentage": 16.12},
+                    {"age_group": "25-34 years", "year": "2022", "percentage": 19.03},
+                    {"age_group": "35-44 years", "year": "2022", "percentage": 18.45},
+                    {"age_group": "45-54 years", "year": "2022", "percentage": 20.17},
+                    {"age_group": "55-64 years", "year": "2022", "percentage": 21.68},
+                    {"age_group": "65 and over", "year": "2022", "percentage": 4.54},
+                    {"age_group": "Under 25 years", "year": "2023", "percentage": 15.58},
+                    {"age_group": "25-34 years", "year": "2023", "percentage": 18.86},
+                    {"age_group": "35-44 years", "year": "2023", "percentage": 18.42},
+                    {"age_group": "45-54 years", "year": "2023", "percentage": 20.25},
+                    {"age_group": "55-64 years", "year": "2023", "percentage": 22.07},
+                    {"age_group": "65 and over", "year": "2023", "percentage": 4.81},
+                    {"age_group": "Under 25 years", "year": "2024", "percentage": 17.12},
+                    {"age_group": "25-34 years", "year": "2024", "percentage": 19.83},
+                    {"age_group": "35-44 years", "year": "2024", "percentage": 16.42},
+                    {"age_group": "45-54 years", "year": "2024", "percentage": 18.52},
+                    {"age_group": "55-64 years", "year": "2024", "percentage": 21.83},
+                    {"age_group": "65 and over", "year": "2024", "percentage": 6.29}
+                    ]
+            },
+            "transform": [{"filter": "datum.year == selected_year"}],
+            "mark": {"type": "arc", "innerRadius": 80},
+            "encoding": {
+                "theta": {"field": "percentage", "type": "quantitative"},
+                "color": {
+                    "field": "age_group",
+                    "type": "nominal",
+                    "scale": {"scheme": "magma"},
+                    "legend": {"title": "Age Group"}
+                },
+                "tooltip": [
+                    {"field": "age_group", "type": "nominal", "title": "Age Group"},
+                    {"field": "percentage", "type": "quantitative", "title": "Percentage (%)"}
+                ]
+            },
+            "config": {}
+        };
+        vegaEmbed("#vis2", spec2, {mode: "vega-lite"}).then(console.log).catch(console.warn);
+    </script>
+</body>
+</html>
